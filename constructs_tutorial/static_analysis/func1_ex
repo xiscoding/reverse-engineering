@@ -1,0 +1,35 @@
+This function, func1, searches for a substring (param_2) within a string (param_1) and prints the index of the first occurrence of the substring. If the substring is not found, it prints a message indicating so. The function returns 1 (true) if the substring is found, and 0 (false) otherwise.
+
+Let's analyze the code line by line:
+
+1-2. undefined4 func1(char *param_1,char *param_2): Defines a function func1 that returns an undefined4 type, which typically represents a 4-byte integer (e.g., int in C on most platforms), and takes two parameters, both of which are pointers to characters (char *). These parameters are intended to be strings (null-terminated character arrays).
+
+3-10. Variable declaration block:
+
+size_t sVar1;: Declares a variable sVar1 of type size_t, which is used to store sizes and is unsigned. It's typically used here to store the result of strlen, which returns the length of a string.
+uint local_20;: Declares an unsigned integer local_20 used to track the progress of comparing the substring with portions of the main string.
+uint local_1c;: Another unsigned integer used to keep track of the current index within param_1 being examined.
+char *local_18;, char *local_14;, char *local_10;: Pointers to characters, used for navigating through the strings during comparison.
+local_10 = param_1;: Initializes local_10 with param_1, to iterate through the main string without altering param_1.
+
+local_1c = 0;: Initializes the index tracker (local_1c) to 0.
+
+14-34. The main loop:
+
+This do-while loop iterates through each character of param_1 to find if param_2 exists within it.
+15-17. Inside the loop, it first assigns param_2 to local_14 to start comparison from the beginning of param_2 for each new character in param_1. It then calculates the length of param_1 to check against local_1c to determine if the end of param_1 has been reached.
+
+18-21. If local_1c is greater than or equal to the length of param_1, it means the substring was not found. It prints a message and returns 0.
+
+22-23. Checks if the current character pointed by local_10 matches the first character of param_2. If so, it starts to compare the following characters.
+
+local_20 = 0;: Resets the comparison index for the substring.
+25-29. This for loop iterates over the substring (param_2) and the segment of the main string starting from the current local_10 position, comparing character by character.
+
+30-32. After exiting the loop, it checks if local_20 equals the length of param_2, indicating a match was found. It prints the index (local_1c) where the substring starts and returns 1.
+
+Moves to the next character in param_1 and increments the index tracker.
+
+The loop condition is true, creating an infinite loop. The function only exits upon finding the substring or reaching the end of param_1.
+
+In summary, this function iteratively compares segments of param_1 with param_2 to find a substring match. When a match is found, it prints the starting index of the substring within param_1 and exits. If param_1 is fully traversed without finding param_2, it informs the user that the substring was not found.
