@@ -1,0 +1,62 @@
+# winDbg
+
+There's a windowsSDK install and winDBG 'direct' install
+- WindowSDK: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+- WinDBG: https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/
+- SymbolPath: https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/ symbol-path
+- set up symbols help: https://stackoverflow.com/questions/30019889/how-to-set-up-symbols-in-windbg
+- clean vm (reset disk): https://superuser.com/questions/455110/restoring-a-virtualbox-vm-to-a-clean-default-state
+- 
+## Windows SDK
+
+- Download Installer: 
+-   - features: Debug Tools
+-   - windowsKits -> winDbg(x64)?ARM64
+
+### Symbol Tables
+
+- check is symchk recognized in cmd
+    - if not: add symchk to path 
+
+ Use 'symchk' to download the symbols
+• Located in: c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\
+• Example: symchk.exe /if "C:\Windows\system32\kernel32.dll" /su SRV*c:\symbols\
+*http://msdl.microsoft.com/download/symbols
+• Set the symbol path and load symbols
+• .sympath c:\symbols
+• .reload /f
+• Download both x86 and x64 dlls
+• x86 – C:\Windows\SysWOW64\ntdll.dll
+• x64 – C:\Windows\system32\ntdll.dll
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# WinDbg VIDEO
+
+Oldest
+1. WinDbg Preview vs. WinDbg
+2. Windows 11: WinDbg Preview is installed, Windows SDK is installed without Debuggers
+3. The install process and documentation are different, the programs themselves do not look similar
+4. Install Windows SDK (WinDBG)
+5. Map network drive window (hehe quick tutorial in tutorial)
+6. File explorer settings change
+7. Add symchk to path
+8. download symbols
+    Download both x86 and x64 dlls
+    • x86 – C:\Windows\SysWOW64\ntdll.dll
+    • x64 – C:\Windows\system32\ntdll.dll
+9. set symbol path

@@ -1,0 +1,65 @@
+# Ghidra Install 
+
+## Installation: 
+- Installation Guide: https://htmlpreview.github.io/?https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_11.0.2_build/GhidraDocs/InstallationGuide.html
+- github: https://github.com/NationalSecurityAgency/ghidra
+#### INSTALL JDK
+- Ubuntu: `java -version'
+- Requires: Java 17 64-bit Runtime and Development Kit (JDK)
+- Linux and macOS (OS X): Extract the JDK distribution (.tar.gz file) to your desired location, and add the JDK's bin directory to your PATH:
+    1. Extract the JDK: 
+        1. `tar xvf <JDK distribution .tar.gz>`
+    2. Open ~/.bashrc with an editor of your choice. For example:
+        1. `vi ~/.bashrc`
+    3. At the very end of the file, add the JDK bin directory to the PATH variable:
+        1. `export PATH=<path of extracted JDK dir>/bin:$PATH`
+    4. Save file
+    5. Restart any open terminal windows for changes to take effect
+
+#### Install Gradle
+- `curl -s "https://get.sdkman.io" | bash`
+- `source "$HOME/.sdkman/bin/sdkman-init.sh"`
+- `sdk version`
+- You should see output containing the latest script and native versions:
+```
+SDKMAN!
+script: 5.18.2
+native: 0.4.6
+```
+
+#### Native Binaries 
+In order to build native binaries for your platform, you will need the following installed on your system:
+
+- A supported version of a Java Development Kit
+- Gradle 7.3+
+
+- make, gcc, and g++ (Linux/macOS-only)
+- Microsoft Visual Studio 2017 or later, or Microsoft C++ Build Tools with the following components installed (Windows-only):
+    - MSVC
+    - Windows SDK
+    - C++ ATL
+    
+To **build the native binaries** for your current platform, execute the following script:
+
+`<GhidraInstallDir>/support/buildNatives(.bat)`
+When this script successfully completes, Ghidra will contain newly built native binaries in the relevant modules' build/os/<platform>/ subdirectories, which will override any existing pre-built native binaries in the os/<platform>/ subdirectories.
+
+### Install Ghidra 
+    1. Extract source: https://github.com/NationalSecurityAgency/ghidra/releases
+        1. NOTE: The official multi-platform release file is named ghidra_<version>_<release>_<date>.zip which can be found under the "Assets" drop-down. 
+        2. **Downloading either of the files named "Source Code" is not correct for this step.**
+    3. Extract Ghidra release file
+    4. Launch Ghidra: `./ghidraRun` (or `ghidraRun.bat` for Windows)
+
+# Ghidra Recomp Install
+This Python command line tool decompiles all functions of a binary and writes them to a directory in separate C files
+
+## Installation: 
+github: https://github.com/clearbluejar/ghidrecomp?tab=readme-ov-file
+
+    1. Download and install Ghidra and Java required for Ghidra.
+    2. Set Ghidra Environment Variable GHIDRA_INSTALL_DIR to Ghidra install location. (https://help.ubuntu.com/community/EnvironmentVariables) (https://askubuntu.com/questions/730/how-do-i-set-environment-variables)
+        1. `export GHIDRA_INSTALL_DIR=<Ghidra Install DIR>` (TEMPORARY) 
+        2. my path => "/home/xdoestech/Documents/Ghidra/ghidra_11.0.2_PUBLIC_20240326/ghidra_11.0.2_PUBLIC"
+        3. make permenent by adding to end of ~/.bashrc file (https://unix.stackexchange.com/questions/117467/how-to-permanently-set-environmental-variables)
+    3. `pip install ghidrecomp`
