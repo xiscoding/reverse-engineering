@@ -14,7 +14,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 import os
 
-
 goal_template = """
 We are analyzing a binary file in order to understand its functionality. 
 We will be following a static analysis procedure.

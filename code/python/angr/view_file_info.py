@@ -7,12 +7,13 @@ Created on Sun Mar 31 12:16:35 2024
 """
 
 import os
-FILENAME = '/home/xdoestech/Desktop/reverse_engineering/code/c_code/myFirst_crackme/fread'
+FILENAME = '/home/xdoestech/Desktop/reverse_engineering/code/executables/yeungrebecca_170091_32959806_crackme'
 
 import subprocess
 
 def get_file_info(filename):
     """
+    Runs 'file' command 
     Parameters
     ----------
     filename : string
@@ -31,6 +32,7 @@ def get_file_info(filename):
 
 def get_strings(filename, min_length=4):
     """
+    Runs 'strings' command 
     Parameters
     ----------
     filename : String
@@ -60,46 +62,120 @@ def is_elf_file(file_info):
     return "ELF" in file_info
 
 def readelf_analysis(filename):
+    """
+    Runs 'readelf' command with -h, -s flags
+    Parameters
+    ----------
+    filename : String
+        path to file 
+
+    Returns
+    -------
+    headers : String
+        Displays the information contained in the ELF header at the start of the file.
+    symbols : String
+        Displays the entries in symbol table section of the file, if
+           it has one.  If a symbol has version information associated
+           with it then this is displayed as well.
+    """
     headers = subprocess.run(['readelf', '-h', filename], capture_output=True, text=True).stdout
-    sections = subprocess.run(['readelf', '-s', filename], capture_output=True, text=True).stdout
-    return headers, sections
+    symbols = subprocess.run(['readelf', '-s', filename], capture_output=True, text=True).stdout
+    return headers, symbols
 
 def view_hexdump(filename):
+    """
+    Runs 'xxd' command
+    xxd - make a hexdump or do the reverse.
+    Parameters
+    ----------
+    filename : String
+        path to file
+
+    Returns
+    -------
+    TYPE string
+        a hex dump of a given file or standard input.
+    """
     return subprocess.run(['xxd', filename], capture_output=True, text=True).stdout
 
 def edit_hex(filename, address, hex_data):
+    """
+    Edit the hex dump
+    reverse operation: convert (or patch) hexdump into binary. 
+    If not writing to stdout, 
+    xxd writes into its output file without truncating it
+    Parameters
+    ----------
+    filename : String
+        path to file.
+    address : String
+        binary address, location to edit.
+    hex_data : String
+        data to be inserted at address location
+
+    Returns
+    -------
+    None.
+
+    """
     # Example: echo "0000000: 4142" | xxd -r - unknown2.bin
     echo_process = subprocess.Popen(['echo', f"{address}: {hex_data}"], stdout=subprocess.PIPE)
     subprocess.run(['xxd', '-r', '-', filename], stdin=echo_process.stdout)
     
 def disassemble(filename, mode='intel'):
+    """
+    Runs 'objdump' command with -M, -s flags
+
+    Parameters
+    ----------
+    filename : String
+        path to file.
+    mode : String, optional
+        Pass target specific information to the disassembler.
+        The default is 'intel', intel syntax mode
+
+    Returns
+    -------
+    disassembled : String
+        Disassembled file.
+    hexdump : String
+        hexdump of file.
+
+    """
     disassembled = subprocess.run(['objdump', '-M', mode, '-d', filename], capture_output=True, text=True).stdout
     hexdump = subprocess.run(['objdump', '-s', filename], capture_output=True, text=True).stdout
     #objdump -drwC -Mintel --visualize-jumps=color https://stackoverflow.com/questions/74793599/better-way-than-a-terminalobjdump-to-read-assembly
     return disassembled, hexdump
 
 def decompile(filename, output_dir=None):
+    """
+    Decompiles all functions in a binary using ghidrecomp.
+
+    Parameters
+    ----------
+    filename : String
+        path to file.
+    output_dir : String, optional
+        Directory to store the decompiled functions. The default is None.
+        IF none specified ghidrecomps folder is created in working directory
+    Returns
+    -------
+    None.
+
+    """
     #https://reverseengineering.stackexchange.com/questions/21207/use-ghidra-decompiler-with-command-line
     #https://reverseengineering.stackexchange.com/questions/21630/ghidra-how-to-run-a-python-3-script-with-headless-analyzer/21632#21632
     #https://github.com/clearbluejar/ghidrecomp
-  """
-  Decompiles all functions in a binary using ghidrecomp.
-  Args:
-      filename: Path to the binary file to decompile.
-      mode: Decompilation mode (e.g., "high", "medium", "low").
-      output_dir: Directory to store the decompiled functions.
-          IF none specified ghidrecomps folder is created in working directory
-  """
-  if output_dir is None:
-      # Build the ghidrecomp command
-      output_dir = 'ghidrecomps'
-      command = ["ghidrecomp", filename]
-  else:
-      command = ["ghidrecomp", "-o", output_dir, filename]
-  # Execute the command using subprocess.run
-  subprocess.run(command, check=True)
-  # Handle potential errors (raised by check=True)
-  print(f"Decompiled functions written to: {output_dir}")
+    if output_dir is None:
+        # Build the ghidrecomp command
+        output_dir = 'ghidrecomps'
+        command = ["ghidrecomp", filename]
+    else:
+        command = ["ghidrecomp", "-o", output_dir, filename]
+    # Execute the command using subprocess.run
+    subprocess.run(command, check=True)
+    # Handle potential errors (raised by check=True)
+    print(f"Decompiled functions written to: {output_dir}")
 
 def trace_with_gdb(binary_path):
     gdb_commands = """
