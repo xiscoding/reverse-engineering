@@ -4,7 +4,7 @@
 - Installation Guide: https://htmlpreview.github.io/?https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_11.0.2_build/GhidraDocs/InstallationGuide.html
 - github: https://github.com/NationalSecurityAgency/ghidra
 #### INSTALL JDK
-- Ubuntu: `java -version'
+- Ubuntu: `java --version'
 - Requires: Java 17 64-bit Runtime and Development Kit (JDK)
 - Linux and macOS (OS X): Extract the JDK distribution (.tar.gz file) to your desired location, and add the JDK's bin directory to your PATH:
     1. Extract the JDK: 
