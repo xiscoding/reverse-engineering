@@ -7,6 +7,9 @@ Created on Sun Mar 31 12:16:35 2024
 """
 
 import os
+from ghidra_manualAnalysis_prep import process_file
+
+
 FILENAME = '/home/xdoestech/Desktop/reverse_engineering/code/executables/yeungrebecca_170091_32959806_crackme'
 
 import subprocess
@@ -198,6 +201,7 @@ if is_elf_file(file_info):
     disassembled, hexdump = disassemble(FILENAME)
 else:
     print(f"{FILENAME} is not an ELF file.")
+process_file(FILENAME, temp_option=True)  
 decompile(FILENAME)
 
 

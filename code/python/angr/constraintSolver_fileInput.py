@@ -10,7 +10,7 @@ import angr
 import claripy
 
 def solve_crackme(binary_path, file_name, file_size):
-    proj = angr.Project(binary_path)
+    proj = angr.Project(binary_path, main_opts = {"base_addr": 0})
 
     # Create a symbolic buffer for the file contents
     file_content = claripy.BVS('file_content', file_size * 8)  # 8 bits per byte
@@ -41,7 +41,7 @@ def solve_crackme(binary_path, file_name, file_size):
 
 
 
-binary_path = '/home/xdoestech/Desktop/reverse_engineering/myFirst_crackme/fread' 
+binary_path = '/home/xdoestech/Desktop/reverse_engineering/code/c_code/myFirst_crackme/fread' 
 file_name = 'test.txt'
 file_size = 10  # You need to specify the expected size of the input, can be estimated or trial-error based
 
