@@ -193,12 +193,64 @@ def trace_with_gdb(binary_path):
     result = subprocess.run(['gdb', '--batch', '-x', 'gdb_commands.gdb', binary_path], capture_output=True, text=True)
     return result.stdout
 
+import os
+import uuid
+
+def create_project_and_save_disassembled_code(disassembled_code):
+    """
+    Creates a project directory with a unique name and saves the disassembled code to a file.
+
+    Args:
+        disassembled_code (str): The disassembled code string.
+
+    Returns:
+        str: The path to the project directory.
+    """
+
+    # Generate a unique project directory name
+    project_name = f"project_{uuid.uuid4()}"
+
+    # Create the project directory
+    project_dir = os.path.join(os.getcwd(), project_name)
+    os.makedirs(project_dir, exist_ok=True)
+
+    # Save the disassembled code to a file
+    disassembled_file_path = os.path.join(project_dir, "disassembled_out.txt")
+    with open(disassembled_file_path, "w") as f:
+        f.write(disassembled_code)
+
+    return project_dir
+
+def find_function_files(function_descriptions, directory):
+    """
+    Searches a directory for C files that contain functions with specified names.
+
+    Args:
+        function_descriptions (dict): A dictionary where keys are function names and values are descriptions.
+        directory (str): The directory to search for files.
+
+    Returns:
+        dict: A dictionary where keys are function names and values are lists of file paths containing the function.
+    """
+
+    function_files = {}
+    for function_name, description in function_descriptions.items():
+        function_files[function_name] = []
+        
+        # Search for files starting with the function name
+        for filename in os.listdir(directory):
+            if filename.endswith(".c") and filename.startswith(function_name):
+                file_path = os.path.join(directory, filename)
+                function_files[function_name].append(file_path)
+    
+    return function_files
 strings = get_strings(FILENAME)
 file_info = get_file_info(FILENAME)
 if is_elf_file(file_info):
     print(f"{FILENAME} is an ELF file.")
     file_header, sym_table = readelf_analysis(FILENAME)
     disassembled, hexdump = disassemble(FILENAME)
+    create_project_and_save_disassembled_code(disassembled)
 else:
     print(f"{FILENAME} is not an ELF file.")
 process_file(FILENAME, temp_option=True)  
