@@ -244,6 +244,7 @@ def find_function_files(function_descriptions, directory):
                 function_files[function_name].append(file_path)
     
     return function_files
+
 strings = get_strings(FILENAME)
 file_info = get_file_info(FILENAME)
 if is_elf_file(file_info):

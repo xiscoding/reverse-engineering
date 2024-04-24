@@ -8,7 +8,8 @@ Key files are listed below
     * Script that runs various terminal commands
     * Inputs/Variables to change:
         * FILENAME: path to file you want to analyze
-        * CREATES FILES MODIFY IF NEEDED
+        * create_project_and_save_disassembled_code(disassembled_code)
+            * creates a new directory and saves disassembled_code there
 * code/python/angr/ghidra_manualAnalysis_prep.py
     * This script is used to prepare your system to run a ghidra project
     * Inputs/Variables to change:
