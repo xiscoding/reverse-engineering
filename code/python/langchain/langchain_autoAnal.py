@@ -88,7 +88,7 @@ Answer: <|eot_id|><|start_header_id|>assistant<|end_header_id|>
 #############################################################################
 #file / directory path
 
-DIRECTORY_PATH = "/home/xdoestech/Desktop/reverse_engineering/code/python/angr/ghidrecomps/bins/yeungrebecca_170091_32959806_crackme-2ccd11f53888bff06925602985688503/decomps"
+DECOMPILED_C_PATH = "/home/xdoestech/Desktop/reverse_engineering/code/python/angr/ghidrecomps/bins/yeungrebecca_170091_32959806_crackme-2ccd11f53888bff06925602985688503/decomps"
 DISASSEMBLED_FILE_PATH = "/home/xdoestech/Desktop/langchain_ex/disassembled_yeung.txt"
 
 #############################################################################
@@ -163,7 +163,7 @@ def parse_function_files(function_files):
 ###LOADERS, DOCUMENTS,
 
 # DirectoryLoader docs: https://python.langchain.com/docs/modules/data_connection/document_loaders/file_directory/
-loader = DirectoryLoader(DIRECTORY_PATH, glob="**/*.c")
+loader = DirectoryLoader(DECOMPILED_C_PATH, glob="**/*.c")
 #docs = [WebBaseLoader(url).load() for url in urls]
 docs = loader.load()
 # docs_list = [item for sublist in docs for item in sublist]
@@ -185,9 +185,7 @@ retriever = vectorstore.as_retriever()
 disassembled_file = open_and_read_file(DISASSEMBLED_FILE_PATH)
 #############################################################################
 
-## Initial Analysis pipeline
-
-### Disassembly Analysis 
+## ANALYSIS CHAIN 
 
 from langchain.prompts import PromptTemplate
 from langchain_community.chat_models import ChatOllama
@@ -202,6 +200,7 @@ llm_gpt_3 =  ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
 
 
 ##### Disassembled Analysis #####
+     ### PROMPT: analyze_disassembled_detect_obfuscation
 prompt_analyze_dissassembled = PromptTemplate(
     template = analyze_disassembled_detect_obfuscation,
     input_variables=["disassembled_str"],
@@ -211,6 +210,7 @@ disassembled_analysis = analyzes_disassembled.invoke({"disassembled_str": disass
 
 
 ##### Function Selection #####
+    ### PROMPT: analyze_disassembled_flow
 prompt_find_func = PromptTemplate(
     template = analyze_disassembled_flow,
     input_variables=["disassembled_str"],
@@ -219,6 +219,7 @@ finds_important_functions = prompt_find_func | llm_gpt_3 | JsonOutputParser()
 chosen_functions = finds_important_functions.invoke({"disassembled_str": docs})
 
 ##### Decompiled (c file) Analysis #####
+    ### PROMPT: analyze_decompiled_analysis
 prompt_analysis_all = PromptTemplate(
     template = analyze_decompiled_analysis,
     input_variables=["question","context","decompiled_code"],
@@ -226,11 +227,9 @@ prompt_analysis_all = PromptTemplate(
 ####### GET QUERY, CONTEXT, DECOMPILED CODE
 QUERY = "What String would solve this crackme?"
 context = disassembled_analysis
-c_file_paths= find_function_files(chosen_functions, DIRECTORY_PATH)
+c_file_paths= find_function_files(chosen_functions, DECOMPILED_C_PATH)
 selected_c_files = parse_function_files(c_file_paths)
 analyzes_everything = prompt_analysis_all | llm_gpt_4 | StrOutputParser()
 fin_analysis = analyzes_everything.invoke({"question" : QUERY, "context" : context, "decompiled_code": selected_c_files})
 
-#############################################################################
-
-##   
+###############################################################################   

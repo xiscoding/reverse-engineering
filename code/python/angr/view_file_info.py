@@ -196,7 +196,7 @@ def trace_with_gdb(binary_path):
 import os
 import uuid
 
-def create_project_and_save_disassembled_code(disassembled_code):
+def create_project_and_save_disassembled_code(disassembled_code, project_dir=None):
     """
     Creates a project directory with a unique name and saves the disassembled code to a file.
 
@@ -211,14 +211,18 @@ def create_project_and_save_disassembled_code(disassembled_code):
     project_name = f"project_{uuid.uuid4()}"
 
     # Create the project directory
-    project_dir = os.path.join(os.getcwd(), project_name)
+    if project_dir:
+        project_dir = os.path.join(project_dir, project_name)
+    else:
+        project_dir = os.path.join(os.getcwd(), project_name)
+    print(f"CREATING PROJECT DIRECTORY AT: {project_dir}")
     os.makedirs(project_dir, exist_ok=True)
 
     # Save the disassembled code to a file
     disassembled_file_path = os.path.join(project_dir, "disassembled_out.txt")
     with open(disassembled_file_path, "w") as f:
         f.write(disassembled_code)
-
+        print(f"DISASSEMBLED CODE SAVED TO: {disassembled_file_path}")
     return project_dir
 
 def find_function_files(function_descriptions, directory):
@@ -236,7 +240,6 @@ def find_function_files(function_descriptions, directory):
     function_files = {}
     for function_name, description in function_descriptions.items():
         function_files[function_name] = []
-        
         # Search for files starting with the function name
         for filename in os.listdir(directory):
             if filename.endswith(".c") and filename.startswith(function_name):
@@ -251,11 +254,11 @@ if is_elf_file(file_info):
     print(f"{FILENAME} is an ELF file.")
     file_header, sym_table = readelf_analysis(FILENAME)
     disassembled, hexdump = disassemble(FILENAME)
-    create_project_and_save_disassembled_code(disassembled)
+    project_dir = create_project_and_save_disassembled_code(disassembled)
 else:
     print(f"{FILENAME} is not an ELF file.")
 process_file(FILENAME, temp_option=True)  
-decompile(FILENAME)
+decompile(FILENAME, project_dir)
 
 
 
