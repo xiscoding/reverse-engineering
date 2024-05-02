@@ -8,9 +8,33 @@ Created on Sun Mar 31 12:16:35 2024
 
 import os
 from ghidra_manualAnalysis_prep import process_file
+import tkinter as tk
+from tkinter import filedialog
 
+def select_file_or_directory():
+    root = tk.Tk()
+    root.withdraw()  # keep the root window from appearing
+    
+    # Ask the user to input the desired path type
+    path_type = None
+    while path_type not in ('f', 'd'):
+        path_type = input("Press 'f' to open a file or 'd' to open a directory: ")
+        if path_type not in ('f', 'd'):
+            print("ERROR: Invalid input, try again.")
+    
+    # Show an "Open" dialog box based on the input
+    if path_type == 'f':
+        path = filedialog.askopenfilename()  # Open a file
+    elif path_type == 'd':
+        path = filedialog.askdirectory()  # Open a directory
 
-FILENAME = '/home/xdoestech/Desktop/reverse_engineering/code/executables/yeungrebecca_170091_32959806_crackme'
+    root.destroy()
+    return path
+
+path = select_file_or_directory()
+print("Selected path:", path)
+
+FILENAME = path #'/home/xdoestech/Desktop/reverse_engineering/code/executables/yeungrebecca_170091_32959806_crackme'
 
 import subprocess
 
@@ -143,12 +167,17 @@ def disassemble(filename, mode='intel'):
         Disassembled file.
     hexdump : String
         hexdump of file.
+    success: boolean
+        flag indicating success or failure of disassembly
 
     """
+    success = True
     disassembled = subprocess.run(['objdump', '-M', mode, '-d', filename], capture_output=True, text=True).stdout
+    if 'Disassembly of section' not in disassembled:
+        success = False
     hexdump = subprocess.run(['objdump', '-s', filename], capture_output=True, text=True).stdout
     #objdump -drwC -Mintel --visualize-jumps=color https://stackoverflow.com/questions/74793599/better-way-than-a-terminalobjdump-to-read-assembly
-    return disassembled, hexdump
+    return disassembled, hexdump, success
 
 def decompile(filename, output_dir=None):
     """
@@ -193,7 +222,6 @@ def trace_with_gdb(binary_path):
     result = subprocess.run(['gdb', '--batch', '-x', 'gdb_commands.gdb', binary_path], capture_output=True, text=True)
     return result.stdout
 
-import os
 import uuid
 
 def create_project_and_save_disassembled_code(disassembled_code, project_dir=None):
@@ -250,15 +278,22 @@ def find_function_files(function_descriptions, directory):
 
 strings = get_strings(FILENAME)
 file_info = get_file_info(FILENAME)
-if is_elf_file(file_info):
+is_elf = is_elf_file(file_info)
+if is_elf:
     print(f"{FILENAME} is an ELF file.")
     file_header, sym_table = readelf_analysis(FILENAME)
-    disassembled, hexdump = disassemble(FILENAME)
-    project_dir = create_project_and_save_disassembled_code(disassembled)
 else:
     print(f"{FILENAME} is not an ELF file.")
+    
+disassembled, hexdump, successful_disassembly = disassemble(FILENAME)
+if successful_disassembly:
+    project_dir = create_project_and_save_disassembled_code(disassembled)
+    decompile(FILENAME, project_dir)
+else:
+    print("Disassembly failed. CHECK FOR PACKING.")
+    print(f"disassembled content: {disassembled}")
+print("preparing to run ghidra...")
 process_file(FILENAME, temp_option=True)  
-decompile(FILENAME, project_dir)
 
 
 

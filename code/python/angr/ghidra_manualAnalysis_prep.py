@@ -130,7 +130,7 @@ def main(filename, temp):
         os.system(f'{GHIDRA_PATH}/support/analyzeHeadless {out_dir} "{proj_name}" -import "{filename}"')
         os.system(f'{GHIDRA_PATH}/ghidraRun "{proj_file}"')
 
-def process_file(filename, temp):
+def process_file(filename, temp_option=True):
     """Process the given file using Ghidra with optional temp settings."""
     if os.path.isdir(filename):
         os.system(f'{GHIDRA_PATH}/ghidraRun')
@@ -138,7 +138,7 @@ def process_file(filename, temp):
     if '.gpr' in filename:
         os.system(f'{GHIDRA_PATH}/ghidraRun "{os.path.abspath(filename)}"')
         return
-    if temp:
+    if temp_option:
         proj_file = uniquify(os.path.join(PROJECT_DIRECTORY, os.path.basename(filename) + '.gpr'))
         out_dir = PROJECT_DIRECTORY
     else:
@@ -148,7 +148,8 @@ def process_file(filename, temp):
     proj_name = os.path.splitext(os.path.basename(proj_file))[0]
     file_output = subprocess.check_output(f'file "{filename}"', shell=True).decode('utf8')
     click.secho(file_output, fg='yellow')
-    if shouldRun():
+    r = shouldRun()
+    if r:
         os.system(f'{GHIDRA_PATH}/support/analyzeHeadless {out_dir} "{proj_name}" -import "{filename}"')
         os.system(f'{GHIDRA_PATH}/ghidraRun "{proj_file}"')
 
