@@ -5,16 +5,18 @@ Created on Sun Mar 31 12:16:35 2024
 
 @author: xdoestech
 """
-
 import os
 from ghidra_manualAnalysis_prep import process_file
 import tkinter as tk
 from tkinter import filedialog
 
-def select_file_or_directory():
+def select_file_or_directory(path='/home/xdoestech/Desktop/Final_Exam_SP24/fe01.bin'):
     root = tk.Tk()
     root.withdraw()  # keep the root window from appearing
-    
+    run_gui = input(f"default path is: {path}, select new path? enter 'y' or 'n'")
+    if 'n' in run_gui:
+        print(f"using default path {path}")
+        return path
     # Ask the user to input the desired path type
     path_type = None
     while path_type not in ('f', 'd'):

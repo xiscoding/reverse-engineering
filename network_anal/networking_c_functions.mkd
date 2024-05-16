@@ -1,0 +1,139 @@
+fe02.bin external functions 
+
+1. in main [0x00400bc - 0x00400ff5]
+    1. atoi: 0x00400c7b
+        1. `#include <stdlib.h>` 
+        2. converts string to integer
+    2. time(): 0x00400c83
+        1. `#include <time.h>`
+        2. returns time since 00:00:00 UTC, January 1, 1970 (Unix timestamp) in seconds
+    3. srand(): 0x00400c8f
+        1. `#include <stdlib.h>`
+        2. Seed rand() with a value (time = tVar3)in this case
+        3. Two different initializations with the same seed will generate the same succession of results
+    4. rand(): 0x00400cc3
+        1. `#include <stdlib.h>`
+        2. RETURNS pseudo-random integer between 0-RAND_MAX
+        3. srand sets the starting point
+    5. access(): 0x00400d14
+        1. `#include <unistd.h>`
+        2. int access(const char *pathname, int mode);
+        3. checks whether the calling process can access the file pathname. If pathname is a symbolic link, it is dereferenced.
+        4. On success (all requested permissions granted), zero is returned. 
+        5. On error (at least one bit in mode asked for a permission that is denied, or some other error occurred), -1 is returned, and errno is set appropriately.
+    6. socket: 0x00400d3x
+        1. `#include <sys/socket.h>`
+        2. `int socket(int domain, int type, int protocol);`
+        3. creates an endpoint for communication and returns a file descriptor that refers to that endpoint.  
+        4. The file descriptor returned by a successful call will be the lowest-numbered file descriptor not currently open for the process.
+        5. [man](https://man7.org/linux/man-pages/man2/socket.2.html)
+    7. htons(): 0x00400d67
+        1. `#include <arpa/inet.h>`
+        2. converts the unsigned short integer hostshort from host byte order to network byte order.
+    8. htonl(): 0x00400d75
+        1. `#include <arpa/init.>`
+        2. function converts the unsigned integer hostlong from host byte order to network byte order.
+    9. bind(): 0x00400d8e
+        1. `#include <sys/socket.h>`
+        2. int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+        3. assigns the address specified by addr to the socket referred to by the file descriptor sockfd. 
+        4. addrlen specifies the size, in bytes, of the address structure pointed to by addr.
+        5. RETURN:  On success, zero is returned.  On error, -1 is returned,errno is set to indicate the error
+        6. [man](https://man7.org/linux/man-pages/man2/bind.2.html)
+    10. listen(): 0x00400bd5
+        1. `#include <sys/socket.h>`
+        2. int listen(int sockfd, int backlog);
+        3. marks the socket referred to by sockfd as a passive socket
+        4. that is, as a socket that will be used to accept incoming connection requests using accept(2)
+        5. RETURN:  On success, zero is returned.  On error, -1 is returned,errno is set to indicate the error
+        6. [man](https://man7.org/linux/man-pages/man2/listen.2.html)
+    11. accept: 0x00400d14
+        ```
+        #include <sys/socket.h>
+        int accept(int sockfd, struct sockaddr *_Nullable restrict addr,
+                  socklen_t *_Nullable restrict addrlen);
+        ```
+        1. libc function [man](https://man7.org/linux/man-pages/man2/accept.2.html)
+        2. The argument sockfd is a socket that has been created with
+            socket(2), bound to a local address with bind(2), and is
+            listening for connections after a listen(2).
+        3. The argument addr is a pointer to a sockaddr structure.
+        4. The addrlen argument is a value-result argument: the caller must
+            initialize it to contain the size (in bytes) of the structure
+            pointed to by addr; on return it will contain the actual size of
+            the peer address.
+        5. RETURN VALUE: these system calls return a file descriptor for the
+            accepted socket (a nonnegative integer).  On error, -1 is
+            returned, errno is set to indicate the error, and addrlen is left
+            unchanged.
+    12. recv(): 0x00400e22
+        1. `#include <sys/socket.h>`
+        2. recv(int sockfd, void buf[.len], size_t len, int flags);
+        3. used to receive messages from a socket
+        4. RETURN VALUE: These calls return the number of bytes received, or -1 if an error occurred. errno is set to indicate the error
+        5. returns 0: 
+            1. stream socket peer has performed an orderly shutdown
+            2. zero-length datagrams is recieved
+            3. requested number of bytes to receive from a stream socket was 0
+        6. [man](https://man7.org/linux/man-pages/man2/recv.2.html)
+    13. close(): 0x00400e6d
+        1. `#include <unistd.h>`
+        2. `int close(int fd);`
+        3. closes a file descriptor, so that it no longer refers to any file and may be reused
+    14. fopen(): 0x00400e88
+        1. fopen(const char *filename, const char *mode)
+        2. mode: contains file access mode
+            1. "w": creates empty for file, if file already exists it is erased
+            2. "r": Opens a file for reading, file must exist
+            3. "a": Appends to a file, file created if does not exist
+            4. "r+": opens file for reading and writing, file must exist
+            5. "w+": Creates an empty file for reading and writing
+            6. "a+": Opens file for reading and appending
+    15. fputs(): 0x00400e9f
+        1. writes string to specified stream
+        2. int fputs(const char *str, FILE *stream)
+    16. fclose(): 0x00400eab
+        1. int fclose(FILE *stream)
+        2. closes stream
+    17. fgetc(): 0x00400fb2
+        1. int fgetc(FILE *stream)
+        2. gets next character (an unsigned char) from the specified stream and advances the position indicator for the stream.
+    18. __ctype_b_loc(): 0x00400ece
+        1. `#include <ctype.h>`
+        2. const unsigned short * * __ctype_b_loc (void);
+        3. return a pointer to the array of characters to be used for the ctype() family of functions
+    19. putchar(): 0x00400fa6
+        1. int putchar(int ch)
+        2. accepts a mandatory parameter ch which is the character to be written to stdout
+    20. __stack_chk_fail(): 0x00400feb
+        1. `#include <libc.h>`
+        2. void __stack_chk_fail(void);
+        3. does not check for a stack overflow itself. It merely reports one when invoked
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

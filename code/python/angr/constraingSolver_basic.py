@@ -1,7 +1,7 @@
 import angr 
 import claripy 
 
-BINARY_DIR = '/home/xdoestech/Desktop/reverse_engineering/code/executables/yeungrebecca_170091_32959806_crackme'
+BINARY_DIR = '/home/xdoestech/Desktop/reverse_engineering/code/executables/fe01_dump_try2_SCY.exe'
 
 proj = angr.Project(BINARY_DIR, main_opts = {"base_addr": 0})
 #proj = angr.Project(BINARY_DIR)
@@ -23,8 +23,8 @@ sim_mgr = proj.factory.simulation_manager(state)
 
 #preform analyis find success addr avoid fail_addr
 #in main find the 
-success_addr = 0x1320
-fail_addr = 0x1339
+success_addr = 0x11FC
+fail_addr = 0x11D2
 sim_mgr.explore(find=success_addr, avoid=[fail_addr])
 
 if len(sim_mgr.found) > 0:

@@ -164,6 +164,8 @@ cython_debug/
 *.gif
 .*
 code/python/angr/ghidrecomps/*
+code/python/angr/project_*
 ova_files_2024
 ghidrecomps/*
 code/ghidra_projects/*
+code/executables*

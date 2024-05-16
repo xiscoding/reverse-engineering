@@ -1,0 +1,117 @@
+# Create internal-only network between Windows and Linux
+
+## Set up target machine (windows)
+* Use clean windows image
+* VMbox -> devices -> connect network adapter2
+* Set static IP address in Windows VM
+* Windows settings -> Network & Internet -> status -> Ethernet -> properties -> IP setting/IP assignment -> edit -> manual
+    * IP Address: 10.0.0.2
+    * Subnet: 255.255.255.0 OR subnet length: 24
+    * Default GW: 10.0.0.1
+    * DNS: 10.0.0.1
+* Disable all firewall settings
+* Windows Settings -> Firewall & Protection
+    * Domain Network -> Microsoft Defender firewall off
+    * Private Network -> Microsoft Defender firewall off
+    * Public Network -> Microsoft Defender firewall off
+* **DONE WITH WINDOWS** TEST CONNECTION: `ping -t <ip address to connect (10.0.0.1 here)>`
+
+
+## SET UP DEBIAN VM (GATWAY)
+* * Use clean debian image
+* VMbox -> devices -> connect network adapter2 AND connect network adapter1
+* check link for new device `ip addr` or `ip link show`
+```
+enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+```
+* IF not state UP -> `sudo ip addr add 10.0.0.1/24 dev enp0s8`
+* check again -> `ip addr` -> look for `enp0s8` -> `inet 10.0.0.1/24 scope global enp0s8`
+* check connection `ping 10.0.0.2(ip of target)` should see transmitted packets
+### **NOTE** steps above can be used to setup any debian/ubuntu target or attack machine (change ip address keep subnet **24**)
+### SET UP inetsim
+``` 
+sudo su -
+apt update
+apt install inet sim
+logout
+``` 
+* edit inet conf file
+* `sudo nano etc/inetsim/inetsim.conf`
+* comment everything below `start_service dns`
+* find `service_bind_address` -> uncomment/change -> `service_bind_address 10.0.0.1`
+* uncomment `dns_bind_port 53`
+* uncomment/change -> `dns_default_ip 10.0.0.1`
+* save/quit
+* run `sudo systemctl restart inetsim.service`
+### SET UP wireshark
+* change permissions `sudo chmod 4711 /usr/bin/dumpcap`
+* Run wireshark -> should see `enp0s8`
+* click `enp0s8` to monitor traffic
+* Open browser on target machine (windows)
+* open terminal on attack machine (debian)
+* run `sudo nc -l -p 80` (netcat listen to port 80)
+* enter website on target
+* should see traffic in attack terminal
+* **DONE WITH DEBIAN**
+
+## USING scripts to attack
+* on attack make attack file 
+* `sudo nc -l -p 80 < attack_file.html
+* target will load html when using browser
+* `ps -ef | grep <attack username>` -> see ports used
+* send data with netcat `echo "HELLO" | nc <ip and port number`
+
+## send and receive data
+send to port 8080 (should be open) check ports in use with `netstat -tulpn`
+* ON TARGET: listen to port 8080 `sudo nc -l 8080`
+* ON ATTACK: `echo "TEST MESSAGE" | nc <target ip addr> 8080`
+
+## OTHER USEFUL networking commands
+### Checking Open Ports
+#### netstat:
+Open a terminal window and run the following command:
+```
+Bash
+netstat -tulpn 
+```
+* Explanation of the flags:
+    * -t: Show TCP connections.
+    * -u: Show UDP connections.
+    * -l: Show only listening ports.
+    * -p: Show the process ID and name of the program associated with each socket.
+    * -n: Display addresses and port numbers numerically (faster than looking up names).
+* The output will show columns like:
+    * `Proto`: Protocol (TCP or UDP)
+    * `Local Address`: IP address and port your machine is listening on.
+    * `PID/Program name`: ID and Name of the process listening on the port.
+#### lsof:
+Run the following command:
+```
+Bash
+sudo lsof -i -P -n
+``` 
+* Explanation of the flags:
+    * -i: List network connections.
+    * -P: Disable port name to IP address conversions (for speed).
+    * -n: Disable host name to IP address conversions (for speed).
+* The output will show columns like:
+    * `COMMAND`: Name of the process.
+    * `PID`: Process ID.
+    * `FD`: File descriptor, which includes the type (e.g., IPv4, TCP/UDP).
+    * `NAME`: The IP address and port.
+### Listening to Incoming Communication
+Choose one of the following methods depending on your preference:
+#### netstat:
+* Run `netstat -tulpn` periodically to get snapshots of open ports. However, this doesn't show live traffic.
+#### tcpdump:
+Install if not already present: `sudo apt install tcpdump`
+* Run a capture, filtering for a specific port (replace 8080 if needed):
+```
+Bash
+sudo tcpdump -i <interface_name> port 8080 
+```
+* Replace <interface_name> with your active network interface (e.g., eth0). You can find it using ip addr or ifconfig.
+* This will show incoming traffic on port 8080 in real-time.
+#### Wireshark (if installed):
+* Start Wireshark (sudo wireshark) and select your network interface.
+* Apply a display filter like tcp.port == 8080 to focus on traffic on port 8080.
